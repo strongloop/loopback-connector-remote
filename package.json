@@ -1,8 +1,14 @@
 {
   "name": "loopback-connector-remote",
   "version": "1.0.0",
-  "description": "",
+  "description": "Remote REST API connector for Loopback",
   "main": "index.js",
+  "keywords": [
+    "web",
+    "restful",
+    "rest",
+    "StrongLoop"
+  ],
   "scripts": {
     "test": "grunt test"
   },
@@ -10,15 +16,21 @@
     "type": "git",
     "url": "https://github.com/kraman/loopback-connector-remotekr.git"
   },
-  "author": "Krishna Raman <kraman@gmail.com>",
-  "license": "StrongLoop",
-  "bugs": {
-    "url": "https://github.com/kraman/loopback-connector-remotekr/issues"
+  "contributors": [
+    "Ritchie Martori <skawful@gmail.com> (https://github.com/ritch)",
+    "Krishna Raman <kraman@gmail.com> (https://github.com/kraman)"
+  ],
+  "license": {
+    "name": "Dual MIT/StrongLoop",
+    "url": "https://github.com/strongloop/loopback/blob/master/LICENSE"
   },
-  "homepage": "https://github.com/kraman/loopback-connector-remotekr",
+  "bugs": {
+    "url": "https://github.com/strongloop/loopback-connector-remote/issues"
+  },
+  "homepage": "http://loopback.io",
   "dependencies": {
     "loopback-datasource-juggler": "^2.8.0",
-    "strong-remoting": "^2.1.0"
+    "strong-remoting": "^2.3.0"
   },
   "devDependencies": {
     "assert": "^1.1.2",
@@ -27,11 +39,7 @@
     "grunt-browserify": "~3.0.1",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-jshint": "~0.10.0",
-    "grunt-karma": "~0.9.0",
     "grunt-mocha-test": "^0.11.0",
-    "karma": "~0.12.23",
-    "karma-junit-reporter": "^0.2.2",
-    "karma-mocha": "^0.1.9",
     "loopback": "^2.2.0",
     "loopback-datasource-juggler": "^2.9.0",
     "mocha": "~1.21.4",
