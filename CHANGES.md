@@ -1,3 +1,9 @@
+2014-10-01, Version 1.0.1
+=========================
+
+ * Call resolve when defining Models (Ritchie Martori)
+
+
 2014-09-26, Version 1.0.0
 =========================
 
