@@ -1,3 +1,16 @@
+2014-11-27, Version 1.0.3
+=========================
+
+
+
+2014-10-10, Version 1.0.2
+=========================
+
+ * Fix support for browsers (Miroslav Bajtoš)
+
+ * Update contribution guidelines (Ryan Graham)
+
+
 2014-10-01, Version 1.0.1
 =========================
 
@@ -7,13 +20,4 @@
 2014-09-26, Version 1.0.0
 =========================
 
- * Fix strong-remoting dependency version (Krishna Raman)
-
- * Fix relation access via remote connector (Krishna Raman)
-
- * Fix formatting (Krishna Raman)
-
- * Move remote connector from loopback (Krishna Raman)
-
- * init: Initial commit (Krishna Raman)
-
+ * First release!
