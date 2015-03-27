@@ -70,4 +70,19 @@ describe('RemoteConnector', function() {
       done();
     });
   });
+
+  it('should support aliases', function(done) {
+    var RemoteModel = loopback.PersistedModel.extend('TestModel');
+    RemoteModel.attachTo(this.remote);
+
+    var ServerModel = this.ServerModel;
+
+    ServerModel.upsert = function(id, cb) {
+      done();
+    };
+
+    RemoteModel.updateOrCreate({}, function(err, inst) {
+      if (err) return done(err);
+    });
+  });
 });
