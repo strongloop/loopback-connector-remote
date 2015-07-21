@@ -13,7 +13,7 @@ describe('RemoteConnector', function() {
       remoteApp.use(loopback.rest());
       remoteApp.listen(0, function() {
         test.dataSource = loopback.createDataSource({
-          host: remoteApp.get('host'),
+          host: '127.0.0.1',
           port: remoteApp.get('port'),
           connector: loopback.Remote
         });
@@ -40,7 +40,7 @@ describe('RemoteConnector', function() {
 
     remoteApp.listen(0, function() {
       test.remote = loopback.createDataSource({
-        host: remoteApp.get('host'),
+        host: '127.0.0.1',
         port: remoteApp.get('port'),
         connector: loopback.Remote
       });
