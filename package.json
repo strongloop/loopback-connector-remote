@@ -20,7 +20,7 @@
     "Ritchie Martori <skawful@gmail.com> (https://github.com/ritch)",
     "Krishna Raman <kraman@gmail.com> (https://github.com/kraman)"
   ],
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/strongloop/loopback-connector-remote/issues"
   },
