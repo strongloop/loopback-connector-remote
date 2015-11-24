@@ -1,6 +1,7 @@
 var loopback = require('loopback');
 var defineModelTestsWithDataSource = require('./util/model-tests');
 var assert = require('assert');
+var Remote = require('..');
 
 describe('RemoteConnector', function() {
   var remoteApp;
@@ -15,7 +16,7 @@ describe('RemoteConnector', function() {
         test.dataSource = loopback.createDataSource({
           host: '127.0.0.1',
           port: remoteApp.get('port'),
-          connector: loopback.Remote
+          connector: Remote
         });
         done();
       });
@@ -42,7 +43,7 @@ describe('RemoteConnector', function() {
       test.remote = loopback.createDataSource({
         host: '127.0.0.1',
         port: remoteApp.get('port'),
-        connector: loopback.Remote
+        connector: Remote
       });
       done();
     });
