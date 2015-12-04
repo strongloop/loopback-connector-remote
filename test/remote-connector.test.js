@@ -3,6 +3,24 @@ var defineModelTestsWithDataSource = require('./util/model-tests');
 var assert = require('assert');
 var Remote = require('..');
 
+function createAppWithRest() {
+  var app = loopback();
+  app.set('host', '127.0.0.1');
+  app.use(loopback.rest());
+  return app;
+} 
+
+function listenAndSetupRemoteDS(test, app, remoteName, cb) {
+  app.listen(0, function() {
+    test[remoteName] = loopback.createDataSource({
+      host: '127.0.0.1',
+      port: app.get('port'),
+      connector: Remote,
+    });
+    cb();
+  });
+}
+
 describe('RemoteConnector', function() {
   var remoteApp;
   var remote;
@@ -10,16 +28,8 @@ describe('RemoteConnector', function() {
   defineModelTestsWithDataSource({
     beforeEach: function(done) {
       var test = this;
-      remoteApp = loopback();
-      remoteApp.use(loopback.rest());
-      remoteApp.listen(0, function() {
-        test.dataSource = loopback.createDataSource({
-          host: '127.0.0.1',
-          port: remoteApp.get('port'),
-          connector: Remote
-        });
-        done();
-      });
+      remoteApp = createAppWithRest();
+      listenAndSetupRemoteDS(test, remoteApp, 'dataSource', done);
     },
     onDefine: function(Model) {
       var RemoteModel = Model.extend(Model.modelName);
@@ -32,21 +42,13 @@ describe('RemoteConnector', function() {
 
   beforeEach(function(done) {
     var test = this;
-    remoteApp = this.remoteApp = loopback();
-    remoteApp.use(loopback.rest());
     var ServerModel = this.ServerModel =
       loopback.PersistedModel.extend('TestModel');
 
+    remoteApp = test.remoteApp = createAppWithRest();
     remoteApp.model(ServerModel);
 
-    remoteApp.listen(0, function() {
-      test.remote = loopback.createDataSource({
-        host: '127.0.0.1',
-        port: remoteApp.get('port'),
-        connector: Remote
-      });
-      done();
-    });
+    listenAndSetupRemoteDS(test, remoteApp, 'remote', done);
   });
 
   it('should support the save method', function(done) {
@@ -84,6 +86,38 @@ describe('RemoteConnector', function() {
 
     RemoteModel.updateOrCreate({}, function(err, inst) {
       if (err) return done(err);
+    });
+  });
+});
+
+describe('Custom Path', function() {
+  var test = this;
+
+  before(function(done) {
+    var ServerModel = loopback.PersistedModel.extend('TestModel', {}, {
+      http: {path: '/custom'}
+    });
+
+    server = test.server = createAppWithRest();
+    server.dataSource('db', {
+      connector: loopback.Memory,
+      name: 'db'
+    });
+    server.model(ServerModel, {dataSource: 'db'});
+
+    listenAndSetupRemoteDS(test, server, 'remote', done);
+  });
+
+  it('should support http.path configuration', function(done) {
+    var RemoteModel = loopback.PersistedModel.extend('TestModel', {}, {
+      dataSource: 'remote',
+      http: {path: '/custom'}
+    });
+    RemoteModel.attachTo(test.remote);
+
+    RemoteModel.create({}, function(err, instance) {
+      if (err) return assert(err);
+      done();
     });
   });
 });
