@@ -1,5 +1,4 @@
 var assert = require('assert');
-var describe = require('./describe');
 var loopback = require('loopback');
 var PersistedModel = loopback.PersistedModel;
 var TaskEmitter = require('strong-task-emitter');
