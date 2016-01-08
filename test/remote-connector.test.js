@@ -1,122 +1,108 @@
-var loopback = require('loopback');
-var defineModelTestsWithDataSource = require('./util/model-tests');
 var assert = require('assert');
-var Remote = require('..');
-
-function createAppWithRest() {
-  var app = loopback();
-  app.set('host', '127.0.0.1');
-  app.use(loopback.rest());
-  return app;
-} 
-
-function listenAndSetupRemoteDS(test, app, remoteName, cb) {
-  app.listen(0, function() {
-    test[remoteName] = loopback.createDataSource({
-      host: '127.0.0.1',
-      port: app.get('port'),
-      connector: Remote,
-    });
-    cb();
-  });
-}
+var helper = require('./helper');
 
 describe('RemoteConnector', function() {
-  var remoteApp;
-  var remote;
+  var ctx = this;
 
-  defineModelTestsWithDataSource({
-    beforeEach: function(done) {
-      var test = this;
-      remoteApp = createAppWithRest();
-      listenAndSetupRemoteDS(test, remoteApp, 'dataSource', done);
-    },
-    onDefine: function(Model) {
-      var RemoteModel = Model.extend(Model.modelName);
-      RemoteModel.attachTo(loopback.createDataSource({
-        connector: loopback.Memory
-      }));
-      remoteApp.model(RemoteModel);
-    }
+  before(function() {
+    ctx.serverApp = helper.createRestAppAndListen(3001);
+    ctx.ServerModel = helper.createModel({
+      parent: 'TestModel',
+      app: ctx.serverApp,
+      datasource: helper.createMemoryDataSource()
+    });
+    ctx.remoteApp = helper.createRestAppAndListen(3002);
+    ctx.RemoteModel = helper.createModel({
+      parent: 'TestModel',
+      app: ctx.remoteApp,
+      datasource: helper.createRemoteDataSource(ctx.serverApp)
+    });
   });
 
-  beforeEach(function(done) {
-    var test = this;
-    var ServerModel = this.ServerModel =
-      loopback.PersistedModel.extend('TestModel');
-
-    remoteApp = test.remoteApp = createAppWithRest();
-    remoteApp.model(ServerModel);
-
-    listenAndSetupRemoteDS(test, remoteApp, 'remote', done);
+  after(function() {
+    ctx.serverApp.locals.handler.close();
+    ctx.remoteApp.locals.handler.close();
+    ctx.ServerModel = null;
+    ctx.RemoteModel = null;
   });
 
   it('should support the save method', function(done) {
     var calledServerCreate = false;
-    var RemoteModel = loopback.PersistedModel.extend('TestModel');
-    RemoteModel.attachTo(this.remote);
 
-    var ServerModel = this.ServerModel;
-
-    ServerModel.create = function(data, cb) {
+    ctx.ServerModel.create = function(data, cb, callback) {
       calledServerCreate = true;
       data.id = 1;
-      cb(null, data);
-    }
+      if (callback) callback(null, data);
+      else cb(null, data);
+    };
 
-    ServerModel.setupRemoting();
-
-    var m = new RemoteModel({foo: 'bar'});
-    m.save(function(err, inst) {
-      assert(inst instanceof RemoteModel);
+    var m = new ctx.RemoteModel({foo: 'bar'});
+    m.save(function(err, instance) {
+      if (err) return done(err);
+      assert(instance);
+      assert(instance instanceof ctx.RemoteModel);
       assert(calledServerCreate);
       done();
     });
   });
 
   it('should support aliases', function(done) {
-    var RemoteModel = loopback.PersistedModel.extend('TestModel');
-    RemoteModel.attachTo(this.remote);
-
-    var ServerModel = this.ServerModel;
-
-    ServerModel.upsert = function(id, cb) {
-      done();
+    var calledServerUpsert = false;
+    ctx.ServerModel.upsert = function(id, cb) {
+      calledServerUpsert = true;
+      cb();
     };
 
-    RemoteModel.updateOrCreate({}, function(err, inst) {
+    ctx.RemoteModel.updateOrCreate({}, function(err, instance) {
       if (err) return done(err);
+      assert(instance);
+      assert(instance instanceof ctx.RemoteModel);
+      assert(calledServerUpsert);
+      done();
     });
   });
 });
 
 describe('Custom Path', function() {
-  var test = this;
+  var ctx = this;
 
   before(function(done) {
-    var ServerModel = loopback.PersistedModel.extend('TestModel', {}, {
-      http: {path: '/custom'}
+    ctx.serverApp = helper.createRestAppAndListen(3001);
+    ctx.ServerModel = helper.createModel({
+      parent: 'TestModel',
+      app: ctx.serverApp,
+      datasource: helper.createMemoryDataSource(),
+      options: {
+        http: {path: '/custom'}
+      }
     });
 
-    server = test.server = createAppWithRest();
-    server.dataSource('db', {
-      connector: loopback.Memory,
-      name: 'db'
+    ctx.remoteApp = helper.createRestAppAndListen(3002);
+    ctx.RemoteModel = helper.createModel({
+      parent: 'TestModel',
+      app: ctx.remoteApp,
+      datasource: helper.createRemoteDataSource(ctx.serverApp),
+      options: {
+        dataSource: 'remote',
+        http: {path: '/custom'}
+      }
     });
-    server.model(ServerModel, {dataSource: 'db'});
+    done();
+  });
 
-    listenAndSetupRemoteDS(test, server, 'remote', done);
+  after(function(done)
+  {
+    ctx.serverApp.locals.handler.close();
+    ctx.remoteApp.locals.handler.close();
+    ctx.ServerModel = null;
+    ctx.RemoteModel = null;
+    done();
   });
 
   it('should support http.path configuration', function(done) {
-    var RemoteModel = loopback.PersistedModel.extend('TestModel', {}, {
-      dataSource: 'remote',
-      http: {path: '/custom'}
-    });
-    RemoteModel.attachTo(test.remote);
-
-    RemoteModel.create({}, function(err, instance) {
-      if (err) return assert(err);
+    ctx.RemoteModel.create({}, function(err, instance) {
+      if (err) return done(err);
+      assert(instance);
       done();
     });
   });

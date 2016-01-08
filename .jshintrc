@@ -14,8 +14,9 @@
   "quotmark": "single",
   "regexp": true,
   "undef": true,
-  "unused": true,
+  "unused": false,
   "trailing": true,
   "sub": true,
-  "maxlen": 80
+  "maxlen": 80,
+  "predef": [ "describe", "beforeEach", "afterEach", "before", "after", "it" ]
 }
