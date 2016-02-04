@@ -1,6 +1,6 @@
 {
   "name": "loopback-connector-remote",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Remote REST API connector for Loopback",
   "main": "index.js",
   "keywords": [
@@ -10,7 +10,8 @@
     "StrongLoop"
   ],
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "preinstall": "node .sl-blip.js"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,5 @@
     "mocha": "~1.21.4",
     "strong-task-emitter": "0.0.5"
   },
-  "optionalDependencies": {
-    "sl-blip": "http://blip.strongloop.com/loopback-connector-remote@1.0.3"
-  }
+  "optionalDependencies": {}
 }

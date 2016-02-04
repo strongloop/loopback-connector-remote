@@ -1,3 +1,37 @@
+2016-02-04, Version 1.1.0
+=========================
+
+ * Register Models with Dynamic converter (Miroslav Bajtoš)
+
+ * Update README.md (Simon Ho)
+
+ * Clean up tests (Geoffroy)
+
+ * Removed unused describe definition (Geoffroy)
+
+ * Removed unused file (Geoffroy)
+
+ * Removed unused dependencies (Geoffroy)
+
+ * Add test for custom http.path configuration. (Richard Pringle)
+
+ * test: load the correct Remote instance (Miroslav Bajtoš)
+
+ * Refer to licenses with a link (Sam Roberts)
+
+ * Use strongloop conventions for licensing (Sam Roberts)
+
+ * Fix NPM license warning (Simon Ho)
+
+ * test: specify 127.0.0.1 for test server (Ryan Graham)
+
+ * Create proxy methods for aliases (Simon Ho)
+
+ * Fix bad CLA URL in CONTRIBUTING.md (Ryan Graham)
+
+ * Add include mixin (Ritchie Martori)
+
+
 2014-11-27, Version 1.0.3
 =========================
 
