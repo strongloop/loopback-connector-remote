@@ -4,19 +4,24 @@ var helper = require('./helper');
 describe('RemoteConnector', function() {
   var ctx = this;
 
-  before(function() {
-    ctx.serverApp = helper.createRestAppAndListen(3001);
+  before(function setupServer(done) {
+    ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.serverApp,
       datasource: helper.createMemoryDataSource()
     });
-    ctx.remoteApp = helper.createRestAppAndListen(3002);
+    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+  });
+
+  before(function setupRemoteClient(done) {
+    ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.remoteApp,
       datasource: helper.createRemoteDataSource(ctx.serverApp)
     });
+    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
   });
 
   after(function() {
@@ -66,8 +71,8 @@ describe('RemoteConnector', function() {
 describe('Custom Path', function() {
   var ctx = this;
 
-  before(function(done) {
-    ctx.serverApp = helper.createRestAppAndListen(3001);
+  before(function setupServer(done) {
+    ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.serverApp,
@@ -76,8 +81,11 @@ describe('Custom Path', function() {
         http: {path: '/custom'}
       }
     });
+    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+  });
 
-    ctx.remoteApp = helper.createRestAppAndListen(3002);
+  before(function setupRemoteClient(done) {
+    ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.remoteApp,
@@ -87,7 +95,7 @@ describe('Custom Path', function() {
         http: {path: '/custom'}
       }
     });
-    done();
+    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
   });
 
   after(function(done)

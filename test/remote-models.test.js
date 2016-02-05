@@ -5,22 +5,26 @@ var TaskEmitter = require('strong-task-emitter');
 describe('Remote model tests', function() {
   var ctx = this;
 
-  beforeEach(function() {
-    ctx.serverApp = helper.createRestAppAndListen(3001);
+  beforeEach(function(done) {
+    ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.serverApp,
       datasource: helper.createMemoryDataSource(),
       properties: helper.userProperties
     });
+    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+  });
 
-    ctx.remoteApp = helper.createRestAppAndListen(3002);
+  beforeEach(function setupRemoteClient(done) {
+    ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
       parent: 'TestModel',
       app: ctx.remoteApp,
       datasource: helper.createRemoteDataSource(ctx.serverApp),
       properties: helper.userProperties
     });
+    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
   });
 
   afterEach(function() {
