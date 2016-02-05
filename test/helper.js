@@ -7,11 +7,11 @@ exports.createRemoteDataSource = createRemoteDataSource;
 exports.createRestAppAndListen = createRestAppAndListen;
 exports.getUserProperties = getUserProperties;
 
-function createRestAppAndListen(port) {
+function createRestAppAndListen() {
   var app = loopback();
 
   app.set('host', '127.0.0.1');
-  if (port) app.set('port', port);
+  app.set('port', 0);
 
   app.use(loopback.rest());
   app.locals.handler = app.listen();
