@@ -10,8 +10,7 @@
     "StrongLoop"
   ],
   "scripts": {
-    "test": "grunt test",
-    "preinstall": "node .sl-blip.js"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
