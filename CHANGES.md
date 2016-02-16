@@ -1,3 +1,11 @@
+2016-02-16, Version 1.2.0
+=========================
+
+ * Remove blip (Raymond Feng)
+
+ * test: listen on ephemeral ports (Miroslav Bajtoš)
+
+
 2016-02-04, Version 1.1.0
 =========================
 
