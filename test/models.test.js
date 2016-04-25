@@ -94,6 +94,15 @@ describe('Model tests', function() {
     });
   });
 
+  describe('Model methods', function() {
+    it('should support promises', function(done) {
+      assert(User.create() instanceof Promise);
+      assert(User.find() instanceof Promise);
+      assert(User.findById(99) instanceof Promise);
+      done();
+    });
+  });
+
   describe('Model.create([data], [callback])', function() {
     it('should create an instance and save to the attached data source',
         function(done) {
