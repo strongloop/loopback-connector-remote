@@ -1,3 +1,13 @@
+2016-05-03, Version 1.3.0
+=========================
+
+ * Small logic cleanup (Heath Morrison)
+
+ * Added promise support (Heath Morrison)
+
+ * Remove .sl-blip.js (Simon Ho)
+
+
 2016-02-16, Version 1.2.0
 =========================
 
