@@ -28,6 +28,19 @@ module.exports = function(grunt) {
       }
     },
     mochaTest: {
+      'integration': {
+        src: 'test/integration/*.js',
+        options: {
+          reporter: 'dot'
+        }
+      },
+      'integration-xml': {
+        src: 'test/integration/*.js',
+        options: {
+          reporter: 'xunit',
+          captureFile: 'xintegration.xml'
+        }
+      },
       'unit': {
         src: 'test/*.js',
         options: {
@@ -49,8 +62,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task.
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['unit', 'integration']);
 
-  grunt.registerTask('test', [
-    process.env.JENKINS_HOME ? 'mochaTest:unit-xml' : 'mochaTest:unit']);
+  if (process.env.JENKINS_HOME) {
+    grunt.registerTask('unit', ['mochaTest:unit-xml']);
+    grunt.registerTask('integration', ['mochaTest:integration-xml']);
+  } else {
+    grunt.registerTask('unit', ['mochaTest:unit']);
+    grunt.registerTask('integration', ['mochaTest:integration']);
+  }
 };
