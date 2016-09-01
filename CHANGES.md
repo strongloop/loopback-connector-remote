@@ -1,3 +1,9 @@
+2016-09-01, Version 1.3.3
+=========================
+
+ * Add info about LoopBack version compatibility (Miroslav Bajtoš)
+
+
 2016-09-01, Version 1.3.2
 =========================
 

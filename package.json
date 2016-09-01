@@ -1,6 +1,6 @@
 {
   "name": "loopback-connector-remote",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Remote REST API connector for Loopback",
   "main": "index.js",
   "keywords": [
