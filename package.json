@@ -30,7 +30,7 @@
   "homepage": "http://loopback.io",
   "dependencies": {
     "loopback-datasource-juggler": "^3.0.0-alpha.7",
-    "strong-remoting": "^3.0.0-alpha.5"
+    "strong-remoting": "^3.0.0-alpha.6"
   },
   "devDependencies": {
     "assert": "^1.1.2",
