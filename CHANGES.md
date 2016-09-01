@@ -1,3 +1,17 @@
+2016-09-01, Version 2.0.0-alpha.1
+=================================
+
+ * Update to juggler@3 and remoting@3 (Miroslav Bajtoš)
+
+ * lib: use strict, fix whitespaces (Miroslav Bajtoš)
+
+ * test: fix deprecation warnings (Miroslav Bajtoš)
+
+ * test: use strict, handle errors (Miroslav Bajtoš)
+
+ * Start development of 2.x (Miroslav Bajtoš)
+
+
 2016-09-01, Version 1.3.2
 =========================
 
