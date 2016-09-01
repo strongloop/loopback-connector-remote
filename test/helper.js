@@ -5,6 +5,7 @@
 
 'use strict';
 
+var extend = require('util')._extend;
 var loopback = require('loopback');
 var remoteConnector = require('..');
 
@@ -48,8 +49,9 @@ function createRemoteDataSource(remoteApp) {
  * app.
  */
 function createModel(options) {
+  var modelOptions = extend({ forceId: false }, options.options);
   var Model = loopback.PersistedModel.extend(options.parent, options.properties,
-      options.options);
+      modelOptions);
   if (options.app) options.app.model(Model);
   if (options.datasource) Model.attachTo(options.datasource);
   return Model;
