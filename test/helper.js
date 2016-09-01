@@ -20,6 +20,12 @@ function createRestAppAndListen() {
   app.set('host', '127.0.0.1');
   app.set('port', 0);
 
+  app.set('legacyExplorer', false);
+  app.set('remoting', {
+    errorHandler: { debug: true, log: false },
+    context: false,
+  });
+
   app.use(loopback.rest());
   app.locals.handler = app.listen();
 
