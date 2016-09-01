@@ -60,6 +60,7 @@ describe('RemoteConnector', function() {
 
   it('should support aliases', function(done) {
     var calledServerUpsert = false;
+    ctx.ServerModel.patchOrCreate =
     ctx.ServerModel.upsert = function(id, cb) {
       calledServerUpsert = true;
       cb();
