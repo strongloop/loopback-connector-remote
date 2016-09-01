@@ -14,3 +14,7 @@ node_modules
 coverage
 *.tgz
 *.xml
+test
+.travis.yml
+test
+.travis.yml
