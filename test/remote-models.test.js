@@ -3,6 +3,8 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
+'use strict';
+
 var assert = require('assert');
 var helper = require('./helper');
 var TaskEmitter = require('strong-task-emitter');
@@ -43,6 +45,7 @@ describe('Remote model tests', function() {
     it('should create an instance and save to the attached data source',
         function(done) {
       ctx.RemoteModel.create({first: 'Joe', last: 'Bob'}, function(err, user) {
+        if (err) return done(err);
         assert(user instanceof ctx.RemoteModel);
         done();
       });
@@ -54,8 +57,8 @@ describe('Remote model tests', function() {
         function(done) {
       var joe = new ctx.RemoteModel({first: 'Joe', last: 'Bob'});
       joe.save(function(err, user) {
+        if (err) return done(err);
         assert(user.id);
-        assert(!err);
         assert(!user.errors);
         done();
       });
@@ -66,14 +69,14 @@ describe('Remote model tests', function() {
     it('should save specified attributes to the attached data source',
         function(done) {
       ctx.ServerModel.create({first: 'joe', age: 100}, function(err, user) {
-        assert(!err);
+        if (err) return done(err);
         assert.equal(user.first, 'joe');
 
         user.updateAttributes({
           first: 'updatedFirst',
           last: 'updatedLast'
         }, function(err, updatedUser) {
-          assert(!err);
+          if (err) return done(err);
           assert.equal(updatedUser.first, 'updatedFirst');
           assert.equal(updatedUser.last, 'updatedLast');
           assert.equal(updatedUser.age, 100);
@@ -87,12 +90,12 @@ describe('Remote model tests', function() {
     it('should update when a record with id=data.id is found, insert otherwise',
         function(done) {
       ctx.RemoteModel.upsert({first: 'joe', id: 7}, function(err, user) {
-        assert(!err);
+        if (err) return done(err);
         assert.equal(user.first, 'joe');
 
         ctx.RemoteModel.upsert({first: 'bob', id: 7}, function(err,
             updatedUser) {
-          assert(!err);
+          if (err) return done(err);
           assert.equal(updatedUser.first, 'bob');
           done();
         });
@@ -104,9 +107,13 @@ describe('Remote model tests', function() {
     it('should delete a model instance from the attached data source',
         function(done) {
       ctx.ServerModel.create({first: 'joe', last: 'bob'}, function(err, user) {
+        if (err) return done(err);
         ctx.RemoteModel.deleteById(user.id, function(err) {
+          if (err) return done(err);
           ctx.RemoteModel.findById(user.id, function(err, notFound) {
             assert.equal(notFound, null);
+            assert(err && err.statusCode === 404,
+              'should have failed with HTTP 404');
             done();
           });
         });
@@ -118,8 +125,10 @@ describe('Remote model tests', function() {
     it('should find an instance by id from the attached data source',
         function(done) {
       ctx.ServerModel.create({first: 'michael', last: 'jordan', id: 23},
-          function() {
+          function(err) {
+        if (err) return done(err);
         ctx.RemoteModel.findById(23, function(err, user) {
+          if (err) return done(err);
           assert.equal(user.id, 23);
           assert.equal(user.first, 'michael');
           assert.equal(user.last, 'jordan');
@@ -139,8 +148,10 @@ describe('Remote model tests', function() {
         .task(ctx.RemoteModel, 'create', {first: 'jan'})
         .task(ctx.ServerModel, 'create', {first: 'sam'})
         .task(ctx.ServerModel, 'create', {first: 'suzy'})
-        .on('done', function() {
+        .on('done', function(err) {
+          if (err) return done(err);
           ctx.RemoteModel.count({age: {gt: 99}}, function(err, count) {
+            if (err) return done(err);
             assert.equal(count, 2);
             done();
           });

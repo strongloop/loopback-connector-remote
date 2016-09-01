@@ -3,6 +3,8 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
+'use strict';
+
 var assert = require('assert');
 var helper = require('./helper');
 
@@ -67,7 +69,7 @@ describe('RemoteConnector', function() {
       if (err) return done(err);
       assert(instance);
       assert(instance instanceof ctx.RemoteModel);
-      assert(calledServerUpsert);
+      assert(calledServerUpsert, 'server upsert should have been called');
       done();
     });
   });
