@@ -3,6 +3,8 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
+'use strict';
+
 var loopback = require('loopback');
 var remoteConnector = require('..');
 
@@ -17,6 +19,12 @@ function createRestAppAndListen() {
 
   app.set('host', '127.0.0.1');
   app.set('port', 0);
+
+  app.set('legacyExplorer', false);
+  app.set('remoting', {
+    errorHandler: { debug: true, log: false },
+    context: false,
+  });
 
   app.use(loopback.rest());
   app.locals.handler = app.listen();
