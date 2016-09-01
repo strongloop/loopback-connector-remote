@@ -1,3 +1,13 @@
+2016-09-01, Version 1.3.2
+=========================
+
+ * Update README.md (Rick Blalock)
+
+ * Update URLs in CONTRIBUTING.md (#50) (Ryan Graham)
+
+ * Do not use native promises in tests (Simon Ho)
+
+
 2016-05-06, Version 1.3.1
 =========================
 
