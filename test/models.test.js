@@ -3,6 +3,8 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
+'use strict';
+
 var assert = require('assert');
 var helper = require('./helper');
 var TaskEmitter = require('strong-task-emitter');
@@ -103,6 +105,7 @@ describe('Model tests', function() {
     it('should create an instance and save to the attached data source',
         function(done) {
       User.create({first: 'Joe', last: 'Bob'}, function(err, user) {
+        if (err) return done(err);
         assert(user instanceof User);
         done();
       });
@@ -114,8 +117,8 @@ describe('Model tests', function() {
         function(done) {
       var joe = new User({first: 'Joe', last: 'Bob'});
       joe.save(function(err, user) {
+        if (err) return done(err);
         assert(user.id);
-        assert(!err);
         assert(!user.errors);
         done();
       });
@@ -126,14 +129,14 @@ describe('Model tests', function() {
     it('should save specified attributes to the attached data source',
         function(done) {
       User.create({first: 'joe', age: 100}, function(err, user) {
-        assert(!err);
+        if (err) return done(err);
         assert.equal(user.first, 'joe');
 
         user.updateAttributes({
           first: 'updatedFirst',
           last: 'updatedLast'
         }, function(err, updatedUser) {
-          assert(!err);
+          if (err) return done(err);
           assert.equal(updatedUser.first, 'updatedFirst');
           assert.equal(updatedUser.last, 'updatedLast');
           assert.equal(updatedUser.age, 100);
@@ -147,11 +150,11 @@ describe('Model tests', function() {
     it('should update when a record with id=data.id is found, insert otherwise',
         function(done) {
       User.upsert({first: 'joe', id: 7}, function(err, user) {
-        assert(!err);
+        if (err) return done(err);
         assert.equal(user.first, 'joe');
 
         User.upsert({first: 'bob', id: 7}, function(err, updatedUser) {
-          assert(!err);
+          if (err) return done(err);
           assert.equal(updatedUser.first, 'bob');
           done();
         });
@@ -162,10 +165,14 @@ describe('Model tests', function() {
   describe('model.destroy([callback])', function() {
     it('should remove a model from the attached data source', function(done) {
       User.create({first: 'joe', last: 'bob'}, function(err, user) {
+        if (err) return done(err);
         User.findById(user.id, function(err, foundUser) {
+          if (err) return done(err);
           assert.equal(user.id, foundUser.id);
-          foundUser.destroy(function() {
+          foundUser.destroy(function(err) {
+            if (err) return done(err);
             User.findById(user.id, function(err, notFound) {
+              if (err) return done(err);
               assert.equal(notFound, null);
               done();
             });
@@ -179,8 +186,11 @@ describe('Model tests', function() {
     it('should delete a model instance from the attached data source',
         function(done) {
       User.create({first: 'joe', last: 'bob'}, function(err, user) {
+        if (err) return done(err);
         User.deleteById(user.id, function(err) {
+          if (err) return done(err);
           User.findById(user.id, function(err, notFound) {
+            if (err) return done(err);
             assert.equal(notFound, null);
             done();
           });
@@ -191,8 +201,11 @@ describe('Model tests', function() {
 
   describe('Model.findById(id, callback)', function() {
     it('should find an instance by id', function(done) {
-      User.create({first: 'michael', last: 'jordan', id: 23}, function() {
+      User.create({first: 'michael', last: 'jordan', id: 23}, function(err) {
+        if (err) return done(err);
         User.findById(23, function(err, user) {
+          if (err) return done(err);
+          assert(user, 'user should have been found');
           assert.equal(user.id, 23);
           assert.equal(user.first, 'michael');
           assert.equal(user.last, 'jordan');
@@ -214,6 +227,7 @@ describe('Model tests', function() {
         .task(User, 'create', {first: 'suzy'})
         .on('done', function() {
           User.count({age: {gt: 99}}, function(err, count) {
+            if (err) return done(err);
             assert.equal(count, 2);
             done();
           });
