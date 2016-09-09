@@ -1,3 +1,11 @@
+2016-09-09, Version 2.0.0-alpha.2
+=================================
+
+ * Use the new API for defining remoting types (Miroslav Bajtoš)
+
+ * Update dev-dependencies (Miroslav Bajtoš)
+
+
 2016-09-01, Version 2.0.0-alpha.1
 =================================
 
