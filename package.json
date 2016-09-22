@@ -29,8 +29,8 @@
   },
   "homepage": "http://loopback.io",
   "dependencies": {
-    "loopback-datasource-juggler": "^3.0.0-alpha.8",
-    "strong-remoting": "^3.0.0-alpha.6"
+    "loopback-datasource-juggler": "^3.0.0",
+    "strong-remoting": "^3.0.0"
   },
   "devDependencies": {
     "assert": "^1.1.2",
