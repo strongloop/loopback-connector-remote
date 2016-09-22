@@ -1,3 +1,13 @@
+2016-09-22, Version 3.0.0
+=========================
+
+ * Update deps to 3.0.0 RC (Miroslav Bajtoš)
+
+ * Update juggler and loopback in package.json (Amir Jafarian)
+
+ * Bump up minimal loopback version in devDeps (Miroslav Bajtoš)
+
+
 2016-09-09, Version 2.0.0-alpha.2
 =================================
 
