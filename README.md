@@ -1,8 +1,8 @@
 # loopback-connector-remote
 
-Remote REST API connector for [loopback-datasource-juggler](https://github.com/strongloop/loopback-datasource-juggler).
+Remote REST API connector for [loopback](https://github.com/strongloop/loopback).
 
-- The version range 2.x is compatible with LoopBack v3 and newer.
+- The version range 3.x is compatible with LoopBack v3 and newer.
 - Use the older range 1.x for applications using LoopBack v2.
 
 ## Quick Explanation
