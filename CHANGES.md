@@ -1,3 +1,13 @@
+2016-12-05, Version 3.1.0
+=========================
+
+ * Drop support for Node v0.10 and v0.12 (Miroslav Bajtoš)
+
+ * Fix version info in README (Miroslav Bajtoš)
+
+ * Update deps to loopback 3.0.0 RC (Miroslav Bajtoš)
+
+
 2016-09-22, Version 3.0.0
 =========================
 
