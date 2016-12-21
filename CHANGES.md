@@ -1,3 +1,11 @@
+2016-12-21, Version 3.1.1
+=========================
+
+ * Update package.json for LB3 release (Simon Ho)
+
+ * Update paid support URL (Siddhi Pai)
+
+
 2016-12-05, Version 3.1.0
 =========================
 
