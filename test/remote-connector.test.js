@@ -41,7 +41,13 @@ describe('RemoteConnector', function() {
   it('should support the save method', function(done) {
     var calledServerCreate = false;
 
-    ctx.ServerModel.create = function(data, cb, callback) {
+    ctx.ServerModel.create = function(data, options, cb, callback) {
+      if (typeof options === 'function') {
+        callback = cb;
+        cb = options;
+        options = {};
+      }
+
       calledServerCreate = true;
       data.id = 1;
       if (callback) callback(null, data);
@@ -61,7 +67,12 @@ describe('RemoteConnector', function() {
   it('should support aliases', function(done) {
     var calledServerUpsert = false;
     ctx.ServerModel.patchOrCreate =
-    ctx.ServerModel.upsert = function(id, cb) {
+    ctx.ServerModel.upsert = function(id, options, cb) {
+      if (typeof options === 'function') {
+        cb = options;
+        options = {};
+      }
+
       calledServerUpsert = true;
       cb();
     };
