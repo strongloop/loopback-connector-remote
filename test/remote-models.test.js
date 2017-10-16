@@ -11,7 +11,8 @@ const loopback = require('loopback');
 const TaskEmitter = require('strong-task-emitter');
 
 describe('Remote model tests', function() {
-  let serverApp, ServerModel, clientApp, ClientModel;
+  let serverApp, ServerModel, ServerRelatedModel, ServerModelWithSingleChild,
+    clientApp, ClientModel, ClientRelatedModel, ClientModelWithSingleChild;
 
   beforeEach(function setupServer(done) {
     const app = serverApp = helper.createRestAppAndListen();
@@ -19,10 +20,46 @@ describe('Remote model tests', function() {
 
     ServerModel = app.registry.createModel({
       name: 'TestModel',
-      properties: helper.userProperties,
+      properties: helper.getUserProperties(),
+      options: {
+        forceId: false,
+        relations: {
+          children: {
+            type: 'hasMany',
+            model: 'ChildModel',
+            foreignKey: 'parentId',
+          },
+        },
+      },
+    });
+
+    ServerModelWithSingleChild = app.registry.createModel({
+      name: 'TestModelWithSingleChild',
+      properties: helper.getUserProperties(),
+      options: {
+        forceId: false,
+        relations: {
+          child: {
+            type: 'hasOne',
+            model: 'ChildModel',
+            foreignKey: 'parentId',
+          },
+        },
+      },
+    });
+
+    ServerRelatedModel = app.registry.createModel({
+      name: 'ChildModel',
+      properties: {
+        note: {type: 'text'},
+        parentId: {type: 'number'},
+      },
       options: {forceId: false},
     });
+
     app.model(ServerModel, {dataSource: db});
+    app.model(ServerRelatedModel, {dataSource: db});
+    app.model(ServerModelWithSingleChild, {dataSource: db});
 
     serverApp.locals.handler.on('listening', function() { done(); });
   });
@@ -31,15 +68,56 @@ describe('Remote model tests', function() {
     const app = clientApp = loopback({localRegistry: true});
     const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
 
+    ClientRelatedModel = app.registry.createModel({
+      name: 'ChildModel',
+      properties: {
+        note: {type: 'text'},
+        parentId: {type: 'number'},
+      },
+      options: {
+        strict: true,
+      },
+    });
+
     ClientModel = app.registry.createModel({
       name: 'TestModel',
+      properties: helper.getUserProperties(),
+      options: {
+        relations: {
+          children: {
+            type: 'hasMany',
+            model: 'ChildModel',
+            foreignKey: 'parentId',
+          },
+        },
+        strict: true,
+      },
     });
+
+    ClientModelWithSingleChild = app.registry.createModel({
+      name: 'TestModelWithSingleChild',
+      properties: helper.getUserProperties(),
+      options: {
+        relations: {
+          child: {
+            type: 'hasOne',
+            model: 'ChildModel',
+            foreignKey: 'parentId',
+          },
+        },
+        strict: true,
+      },
+    });
+
     app.model(ClientModel, {dataSource: remoteDs});
+    app.model(ClientRelatedModel, {dataSource: remoteDs});
+    app.model(ClientModelWithSingleChild, {dataSource: remoteDs});
   });
 
   afterEach(function() {
     serverApp.locals.handler.close();
     ServerModel = null;
+    ServerRelatedModel = null;
     ClientModel = null;
   });
 
@@ -159,5 +237,83 @@ describe('Remote model tests', function() {
             });
           });
       });
+  });
+
+  describe('Model find with include filter', function() {
+    let hasManyParent, hasManyChild, hasOneParent, hasOneChild;
+    beforeEach(givenSampleData);
+
+    it('should return also the included requested  models', function() {
+      const parentId = hasManyParent.id;
+      return ClientModel.findById(hasManyParent.id, {include: 'children'})
+        .then(returnedUser => {
+          assert(returnedUser instanceof ClientModel);
+          const user = returnedUser.toJSON();
+          assert.equal(user.id, parentId);
+          assert.equal(user.first, hasManyParent.first);
+          assert(Array.isArray(user.children));
+          assert.equal(user.children.length, 1);
+          assert.deepEqual(user.children[0], hasManyChild.toJSON());
+        });
+    });
+
+    it('should return cachedRelated entity without call', function() {
+      const parentId = hasManyParent.id;
+      return ClientModel.findById(parentId, {include: 'children'})
+        .then(returnedUser => {
+          assert(returnedUser instanceof ClientModel);
+          const children = returnedUser.children();
+          assert.equal(returnedUser.id, parentId);
+          assert.equal(returnedUser.first, hasManyParent.first);
+          assert(Array.isArray(children));
+          assert.equal(children.length, 1);
+          assert(children[0] instanceof ClientRelatedModel);
+          assert.deepEqual(children[0].toJSON(), hasManyChild.toJSON());
+        });
+    });
+
+    it('should also work for single (non array) relations', function() {
+      const parentId = hasOneParent.id;
+      return ClientModelWithSingleChild.findById(parentId, {include: 'child'})
+        .then(returnedUser => {
+          assert(returnedUser instanceof ClientModelWithSingleChild);
+          const child = returnedUser.child();
+          assert.equal(returnedUser.id, parentId);
+          assert.equal(returnedUser.first, hasOneParent.first);
+          assert(child instanceof ClientRelatedModel);
+          assert.deepEqual(child.toJSON(), hasOneChild.toJSON());
+        });
+    });
+
+    function givenSampleData() {
+      return ServerModel.create({first: 'eiste', last: 'kopries'})
+        .then(parent => {
+          hasManyParent = parent;
+          return ServerRelatedModel.create({
+            note: 'mitsos',
+            parentId: parent.id,
+            id: 11,
+          });
+        })
+        .then(child => {
+          hasManyChild = child;
+          return ServerModelWithSingleChild.create({
+            first: 'mipos',
+            last: 'tora',
+            id: 12,
+          });
+        })
+        .then(parent => {
+          hasOneParent = parent;
+          return ServerRelatedModel.create({
+            note: 'mitsos3',
+            parentId: parent.id,
+            id: 13,
+          });
+        })
+        .then(child => {
+          hasOneChild = child;
+        });
+    }
   });
 });
