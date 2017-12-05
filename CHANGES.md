@@ -1,3 +1,27 @@
+2017-12-05, Version 3.2.0
+=========================
+
+ * Add support for configuring remoting options (Kenny Sabir)
+
+ * chore:update license (Diana Lau)
+
+ * Move remote connector doc into README (crandmck)
+
+ * build: enable Travis CI (Miroslav Bajtoš)
+
+ * Add stalebot configuration (Kevin Delisle)
+
+ * Update Issue and PR Templates (#76) (Sakib Hasan)
+
+ * Add CODEOWNER file (Diana Lau)
+
+ * Replicate new issue_template from loopback (Siddhi Pai)
+
+ * Replicate issue_template from loopback repo (Siddhi Pai)
+
+ * Add "options" arg to stubbed models in tests (Miroslav Bajtoš)
+
+
 2016-12-21, Version 3.1.1
 =========================
 
