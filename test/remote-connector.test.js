@@ -134,3 +134,15 @@ describe('Custom Path', function() {
     });
   });
 });
+
+describe('RemoteConnector with options', () => {
+  it('should have the remoting options passed to the remote object', () => {
+    const serverApp = helper.createRestAppAndListen();
+
+    const datasource = helper.createRemoteDataSourceWithOptions(
+      serverApp,
+      {'test': 'abc'});
+
+    assert.deepEqual(datasource.connector.remotes.options, {test: 'abc'});
+  });
+});
