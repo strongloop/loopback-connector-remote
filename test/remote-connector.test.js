@@ -5,43 +5,45 @@
 
 'use strict';
 
-var assert = require('assert');
-var helper = require('./helper');
+const assert = require('assert');
+const helper = require('./helper');
+const loopback = require('loopback');
 
 describe('RemoteConnector', function() {
-  var ctx = this;
+  let serverApp, clientApp, ServerModel, ClientModel;
 
   before(function setupServer(done) {
-    ctx.serverApp = helper.createRestAppAndListen();
-    ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.serverApp,
-      datasource: helper.createMemoryDataSource()
+    const app = serverApp = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
+
+    ServerModel = app.registry.createModel({
+      name: 'TestModel',
     });
-    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+    app.model(ServerModel, {dataSource: db});
+
+    app.locals.handler.on('listening', function() { done(); });
   });
 
-  before(function setupRemoteClient(done) {
-    ctx.remoteApp = helper.createRestAppAndListen();
-    ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.remoteApp,
-      datasource: helper.createRemoteDataSource(ctx.serverApp)
+  before(function setupRemoteClient() {
+    const app = clientApp = loopback({localRegistry: true});
+    const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
+
+    ClientModel = app.registry.createModel({
+      name: 'TestModel',
     });
-    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
+    app.model(ClientModel, {dataSource: remoteDs});
   });
 
   after(function() {
-    ctx.serverApp.locals.handler.close();
-    ctx.remoteApp.locals.handler.close();
-    ctx.ServerModel = null;
-    ctx.RemoteModel = null;
+    serverApp.locals.handler.close();
+    ServerModel = null;
+    ClientModel = null;
   });
 
   it('should support the save method', function(done) {
-    var calledServerCreate = false;
+    let calledServerCreate = false;
 
-    ctx.ServerModel.create = function(data, options, cb, callback) {
+    ServerModel.create = function(data, options, cb, callback) {
       if (typeof options === 'function') {
         callback = cb;
         cb = options;
@@ -54,20 +56,20 @@ describe('RemoteConnector', function() {
       else cb(null, data);
     };
 
-    var m = new ctx.RemoteModel({foo: 'bar'});
+    const m = new ClientModel({foo: 'bar'});
     m.save(function(err, instance) {
       if (err) return done(err);
       assert(instance);
-      assert(instance instanceof ctx.RemoteModel);
+      assert(instance instanceof ClientModel);
       assert(calledServerCreate);
       done();
     });
   });
 
   it('should support aliases', function(done) {
-    var calledServerUpsert = false;
-    ctx.ServerModel.patchOrCreate =
-    ctx.ServerModel.upsert = function(id, options, cb) {
+    let calledServerUpsert = false;
+    ServerModel.patchOrCreate =
+    ServerModel.upsert = function(id, options, cb) {
       if (typeof options === 'function') {
         cb = options;
         options = {};
@@ -77,10 +79,10 @@ describe('RemoteConnector', function() {
       cb();
     };
 
-    ctx.RemoteModel.updateOrCreate({}, function(err, instance) {
+    ClientModel.updateOrCreate({}, function(err, instance) {
       if (err) return done(err);
       assert(instance);
-      assert(instance instanceof ctx.RemoteModel);
+      assert(instance instanceof ClientModel);
       assert(calledServerUpsert, 'server upsert should have been called');
       done();
     });
@@ -88,46 +90,45 @@ describe('RemoteConnector', function() {
 });
 
 describe('Custom Path', function() {
-  var ctx = this;
+  let serverApp, clientApp, ServerModel, ClientModel;
 
   before(function setupServer(done) {
-    ctx.serverApp = helper.createRestAppAndListen();
-    ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.serverApp,
-      datasource: helper.createMemoryDataSource(),
+    const app = serverApp = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
+
+    ServerModel = app.registry.createModel({
+      name: 'TestModel',
       options: {
-        http: {path: '/custom'}
-      }
+        http: {path: '/custom'},
+      },
     });
-    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+    app.model(ServerModel, {dataSource: db});
+
+    serverApp.locals.handler.on('listening', function() { done(); });
   });
 
-  before(function setupRemoteClient(done) {
-    ctx.remoteApp = helper.createRestAppAndListen();
-    ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.remoteApp,
-      datasource: helper.createRemoteDataSource(ctx.serverApp),
+  before(function setupRemoteClient() {
+    const app = clientApp = loopback({localRegistry: true});
+    const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
+
+    ClientModel = app.registry.createModel({
+      name: 'TestModel',
       options: {
         dataSource: 'remote',
-        http: {path: '/custom'}
-      }
+        http: {path: '/custom'},
+      },
     });
-    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
+    app.model(ClientModel, {dataSource: remoteDs});
   });
 
-  after(function(done)
-  {
-    ctx.serverApp.locals.handler.close();
-    ctx.remoteApp.locals.handler.close();
-    ctx.ServerModel = null;
-    ctx.RemoteModel = null;
-    done();
+  after(function() {
+    serverApp.locals.handler.close();
+    ServerModel = null;
+    ClientModel = null;
   });
 
   it('should support http.path configuration', function(done) {
-    ctx.RemoteModel.create({}, function(err, instance) {
+    ClientModel.create({}, function(err, instance) {
       if (err) return done(err);
       assert(instance);
       done();
@@ -137,12 +138,13 @@ describe('Custom Path', function() {
 
 describe('RemoteConnector with options', () => {
   it('should have the remoting options passed to the remote object', () => {
-    const serverApp = helper.createRestAppAndListen();
+    const app = loopback();
+    const dataSource = app.dataSource('remote', {
+      url: 'http://example.com',
+      connector: require('..'),
+      options: {'test': 'abc'},
+    });
 
-    const datasource = helper.createRemoteDataSourceWithOptions(
-      serverApp,
-      {'test': 'abc'});
-
-    assert.deepEqual(datasource.connector.remotes.options, {test: 'abc'});
+    assert.deepEqual(dataSource.connector.remotes.options, {test: 'abc'});
   });
 });
