@@ -2,7 +2,7 @@
   "name": "loopback-connector-remote",
   "version": "3.2.0",
   "description": "Remote REST API connector for Loopback",
-  "main": "index.js",
+  "main": "lib/remote-connector.js",
   "keywords": [
     "web",
     "restful",
@@ -10,7 +10,9 @@
     "StrongLoop"
   ],
   "scripts": {
-    "test": "grunt"
+    "test": "grunt",
+    "posttest": "npm run lint",
+    "lint": "eslint ."
   },
   "engines": {
     "node": ">=4.0.0"
@@ -29,6 +31,8 @@
   },
   "homepage": "http://loopback.io",
   "dependencies": {
+    "eslint": "^4.13.0",
+    "eslint-config-loopback": "^8.0.0",
     "loopback-datasource-juggler": "^3.0.0",
     "strong-remoting": "^3.0.0"
   },
@@ -37,7 +41,6 @@
     "bluebird": "^3.3.5",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
-    "grunt-contrib-jshint": "^1.0.0",
     "grunt-mocha-test": "^0.12.7",
     "loopback": "^3.0.0",
     "mocha": "^3.0.2",

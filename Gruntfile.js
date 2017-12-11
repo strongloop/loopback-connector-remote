@@ -3,7 +3,9 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-/*global module:false*/
+'use strict';
+
+/* global module:false */
 module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
@@ -15,46 +17,34 @@ module.exports = function(grunt) {
       '* Copyright (c) <%= grunt.template.today("yyyy") %> ' +
       '<%= pkg.author.name %>;' +
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
-    // Task configuration.
-    jshint: {
-      options: {
-        jshintrc: true
-      },
-      gruntfile: {
-        src: 'Gruntfile.js'
-      },
-      libTest: {
-        src: ['lib/**/*.js', 'test/**/*.js']
-      }
-    },
     mochaTest: {
       'integration': {
         src: 'test/integration/*.js',
         options: {
-          reporter: 'dot'
-        }
+          reporter: 'dot',
+        },
       },
       'integration-xml': {
         src: 'test/integration/*.js',
         options: {
           reporter: 'xunit',
-          captureFile: 'xintegration.xml'
-        }
+          captureFile: 'xintegration.xml',
+        },
       },
       'unit': {
         src: 'test/*.js',
         options: {
-          reporter: 'dot'
-        }
+          reporter: 'dot',
+        },
       },
       'unit-xml': {
         src: 'test/*.js',
         options: {
           reporter: 'xunit',
-          captureFile: 'xunit.xml'
-        }
-      }
-    }
+          captureFile: 'xunit.xml',
+        },
+      },
+    },
   });
 
   // These plugins provide necessary tasks.

@@ -27,34 +27,34 @@ describe('Model tests', function() {
 
   describe('Model.validatesPresenceOf(properties...)', function() {
     it('should require a model to include a property to be considered valid',
-        function() {
-      User.validatesPresenceOf('first', 'last', 'age');
-      const joe = new User({first: 'joe'});
-      assert(joe.isValid() === false, 'model should not validate');
-      assert(joe.errors.last, 'should have a missing last error');
-      assert(joe.errors.age, 'should have a missing age error');
-    });
+      function() {
+        User.validatesPresenceOf('first', 'last', 'age');
+        const joe = new User({first: 'joe'});
+        assert(joe.isValid() === false, 'model should not validate');
+        assert(joe.errors.last, 'should have a missing last error');
+        assert(joe.errors.age, 'should have a missing age error');
+      });
   });
 
   describe('Model.validatesLengthOf(property, options)', function() {
     it('should require a property length to be within a specified range',
-        function() {
-      User.validatesLengthOf('password', {min: 5, message: {min:
+      function() {
+        User.validatesLengthOf('password', {min: 5, message: {min:
           'Password is too short'}});
-      const joe = new User({password: '1234'});
-      assert(joe.isValid() === false, 'model should not be valid');
-      assert(joe.errors.password, 'should have password error');
-    });
+        const joe = new User({password: '1234'});
+        assert(joe.isValid() === false, 'model should not be valid');
+        assert(joe.errors.password, 'should have password error');
+      });
   });
 
   describe('Model.validatesInclusionOf(property, options)', function() {
     it('should require a value for `property` to be in the specified array',
-        function() {
-      User.validatesInclusionOf('gender', {in: ['male', 'female']});
-      const foo = new User({gender: 'bar'});
-      assert(foo.isValid() === false, 'model should not be valid');
-      assert(foo.errors.gender, 'should have gender error');
-    });
+      function() {
+        User.validatesInclusionOf('gender', {in: ['male', 'female']});
+        const foo = new User({gender: 'bar'});
+        assert(foo.isValid() === false, 'model should not be valid');
+        assert(foo.errors.gender, 'should have gender error');
+      });
   });
 
   describe('Model.validatesExclusionOf(property, options)', function() {
@@ -107,63 +107,63 @@ describe('Model tests', function() {
 
   describe('Model.create([data], [callback])', function() {
     it('should create an instance and save to the attached data source',
-        function(done) {
-      User.create({first: 'Joe', last: 'Bob'}, function(err, user) {
-        if (err) return done(err);
-        assert(user instanceof User);
-        done();
+      function(done) {
+        User.create({first: 'Joe', last: 'Bob'}, function(err, user) {
+          if (err) return done(err);
+          assert(user instanceof User);
+          done();
+        });
       });
-    });
   });
 
   describe('model.save([options], [callback])', function() {
     it('should save an instance of a Model to the attached data source',
-        function(done) {
-      const joe = new User({first: 'Joe', last: 'Bob'});
-      joe.save(function(err, user) {
-        if (err) return done(err);
-        assert(user.id);
-        assert(!user.errors);
-        done();
+      function(done) {
+        const joe = new User({first: 'Joe', last: 'Bob'});
+        joe.save(function(err, user) {
+          if (err) return done(err);
+          assert(user.id);
+          assert(!user.errors);
+          done();
+        });
       });
-    });
   });
 
   describe('model.updateAttributes(data, [callback])', function() {
     it('should save specified attributes to the attached data source',
-        function(done) {
-      User.create({first: 'joe', age: 100}, function(err, user) {
-        if (err) return done(err);
-        assert.equal(user.first, 'joe');
-
-        user.updateAttributes({
-          first: 'updatedFirst',
-          last: 'updatedLast'
-        }, function(err, updatedUser) {
+      function(done) {
+        User.create({first: 'joe', age: 100}, function(err, user) {
           if (err) return done(err);
-          assert.equal(updatedUser.first, 'updatedFirst');
-          assert.equal(updatedUser.last, 'updatedLast');
-          assert.equal(updatedUser.age, 100);
-          done();
+          assert.equal(user.first, 'joe');
+
+          user.updateAttributes({
+            first: 'updatedFirst',
+            last: 'updatedLast',
+          }, function(err, updatedUser) {
+            if (err) return done(err);
+            assert.equal(updatedUser.first, 'updatedFirst');
+            assert.equal(updatedUser.last, 'updatedLast');
+            assert.equal(updatedUser.age, 100);
+            done();
+          });
         });
       });
-    });
   });
 
   describe('Model.upsert(data, callback)', function() {
     it('should update when a record with id=data.id is found, insert otherwise',
-        function(done) {
-      User.upsert({first: 'joe', id: 7}, function(err, user) {
-        if (err) return done(err);
-        assert.equal(user.first, 'joe');
-
-        User.upsert({first: 'bob', id: 7}, function(err, updatedUser) {
+      function(done) {
+        User.upsert({first: 'joe', id: 7}, function(err, user) {
           if (err) return done(err);
-          assert.equal(updatedUser.first, 'bob');
-          done();
+          assert.equal(user.first, 'joe');
+
+          User.upsert({first: 'bob', id: 7}, function(err, updatedUser) {
+            if (err) return done(err);
+            assert.equal(updatedUser.first, 'bob');
+            done();
+          });
         });
       });
-    });
   });
 
   describe('model.destroy([callback])', function() {
@@ -188,19 +188,19 @@ describe('Model tests', function() {
 
   describe('Model.deleteById(id, [callback])', function() {
     it('should delete a model instance from the attached data source',
-        function(done) {
-      User.create({first: 'joe', last: 'bob'}, function(err, user) {
-        if (err) return done(err);
-        User.deleteById(user.id, function(err) {
+      function(done) {
+        User.create({first: 'joe', last: 'bob'}, function(err, user) {
           if (err) return done(err);
-          User.findById(user.id, function(err, notFound) {
+          User.deleteById(user.id, function(err) {
             if (err) return done(err);
-            assert.equal(notFound, null);
-            done();
+            User.findById(user.id, function(err, notFound) {
+              if (err) return done(err);
+              assert.equal(notFound, null);
+              done();
+            });
           });
         });
       });
-    });
   });
 
   describe('Model.findById(id, callback)', function() {
@@ -221,21 +221,21 @@ describe('Model tests', function() {
 
   describe('Model.count([query], callback)', function() {
     it('should return the count of Model instances in data source',
-        function(done) {
-      const taskEmitter = new TaskEmitter();
-      taskEmitter
-        .task(User, 'create', {first: 'jill', age: 100})
-        .task(User, 'create', {first: 'bob', age: 200})
-        .task(User, 'create', {first: 'jan'})
-        .task(User, 'create', {first: 'sam'})
-        .task(User, 'create', {first: 'suzy'})
-        .on('done', function() {
-          User.count({age: {gt: 99}}, function(err, count) {
-            if (err) return done(err);
-            assert.equal(count, 2);
-            done();
+      function(done) {
+        const taskEmitter = new TaskEmitter();
+        taskEmitter
+          .task(User, 'create', {first: 'jill', age: 100})
+          .task(User, 'create', {first: 'bob', age: 200})
+          .task(User, 'create', {first: 'jan'})
+          .task(User, 'create', {first: 'sam'})
+          .task(User, 'create', {first: 'suzy'})
+          .on('done', function() {
+            User.count({age: {gt: 99}}, function(err, count) {
+              if (err) return done(err);
+              assert.equal(count, 2);
+              done();
+            });
           });
-        });
-    });
+      });
   });
 });

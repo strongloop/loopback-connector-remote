@@ -99,8 +99,8 @@ describe('Custom Path', function() {
     ServerModel = app.registry.createModel({
       name: 'TestModel',
       options: {
-        http: {path: '/custom'}
-      }
+        http: {path: '/custom'},
+      },
     });
     app.model(ServerModel, {dataSource: db});
 
@@ -115,8 +115,8 @@ describe('Custom Path', function() {
       name: 'TestModel',
       options: {
         dataSource: 'remote',
-        http: {path: '/custom'}
-      }
+        http: {path: '/custom'},
+      },
     });
     app.model(ClientModel, {dataSource: remoteDs});
   });

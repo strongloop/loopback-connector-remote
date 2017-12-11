@@ -22,7 +22,7 @@ function createRestAppAndListen() {
 
   app.set('legacyExplorer', false);
   app.set('remoting', {
-    errorHandler: { debug: true, log: false },
+    errorHandler: {debug: true, log: false},
     context: false,
   });
 
@@ -39,7 +39,7 @@ function createMemoryDataSource(app) {
 function createRemoteDataSource(app, serverApp) {
   return app.dataSource('remote', {
     url: 'http://' + serverApp.get('host') + ':' + serverApp.get('port'),
-    connector: remoteConnector
+    connector: remoteConnector,
   });
 }
 
@@ -51,6 +51,6 @@ function getUserProperties() {
     'password': String,
     'gender': String,
     'domain': String,
-    'email': String
+    'email': String,
   };
 }
