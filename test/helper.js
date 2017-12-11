@@ -10,14 +10,12 @@ var loopback = require('loopback');
 var remoteConnector = require('..');
 
 exports.createMemoryDataSource = createMemoryDataSource;
-exports.createModel = createModel;
 exports.createRemoteDataSource = createRemoteDataSource;
-exports.createRemoteDataSourceWithOptions = createRemoteDataSourceWithOptions;
 exports.createRestAppAndListen = createRestAppAndListen;
 exports.getUserProperties = getUserProperties;
 
 function createRestAppAndListen() {
-  var app = loopback();
+  const app = loopback({localRegistry: true});
 
   app.set('host', '127.0.0.1');
   app.set('port', 0);
@@ -34,36 +32,15 @@ function createRestAppAndListen() {
   return app;
 }
 
-function createMemoryDataSource() {
-  return loopback.createDataSource({connector: 'memory'});
+function createMemoryDataSource(app) {
+  return app.dataSource('db', {connector: 'memory'});
 }
 
-function createRemoteDataSource(remoteApp) {
-  return loopback.createDataSource({
-    url: 'http://' + remoteApp.get('host') + ':' + remoteApp.get('port'),
+function createRemoteDataSource(app, serverApp) {
+  return app.dataSource('remote', {
+    url: 'http://' + serverApp.get('host') + ':' + serverApp.get('port'),
     connector: remoteConnector
   });
-}
-
-function createRemoteDataSourceWithOptions(remoteApp, options) {
-  return loopback.createDataSource({
-    url: 'http://anyURL.com',
-    connector: remoteConnector,
-    options: options
-  });
-}
-
-/**
- * Used to create models based on a set of options. May associate or link to an
- * app.
- */
-function createModel(options) {
-  var modelOptions = extend({ forceId: false }, options.options);
-  var Model = loopback.PersistedModel.extend(options.parent, options.properties,
-      modelOptions);
-  if (options.app) options.app.model(Model);
-  if (options.datasource) Model.attachTo(options.datasource);
-  return Model;
 }
 
 function getUserProperties() {

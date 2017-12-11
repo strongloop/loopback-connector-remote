@@ -5,48 +5,50 @@
 
 'use strict';
 
-var assert = require('assert');
-var helper = require('./helper');
-var TaskEmitter = require('strong-task-emitter');
+const assert = require('assert');
+const helper = require('./helper');
+const loopback = require('loopback');
+const TaskEmitter = require('strong-task-emitter');
 
 describe('Remote model tests', function() {
-  var ctx = this;
+  let serverApp, ServerModel, clientApp, ClientModel;
 
-  beforeEach(function(done) {
-    ctx.serverApp = helper.createRestAppAndListen();
-    ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.serverApp,
-      datasource: helper.createMemoryDataSource(),
-      properties: helper.userProperties
+  beforeEach(function setupServer(done) {
+    const app = serverApp = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
+
+    ServerModel = app.registry.createModel({
+      name: 'TestModel',
+      properties: helper.userProperties,
+      options: {forceId: false},
     });
-    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+    app.model(ServerModel, {dataSource: db});
+
+    serverApp.locals.handler.on('listening', function() { done(); });
   });
 
-  beforeEach(function setupRemoteClient(done) {
-    ctx.remoteApp = helper.createRestAppAndListen();
-    ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
-      app: ctx.remoteApp,
-      datasource: helper.createRemoteDataSource(ctx.serverApp),
-      properties: helper.userProperties
+  beforeEach(function setupRemoteClient() {
+    const app = clientApp = loopback({localRegistry: true});
+    const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
+
+    ClientModel = app.registry.createModel({
+      name: 'TestModel',
     });
-    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
+    app.model(ClientModel, {dataSource: remoteDs});
   });
 
   afterEach(function() {
-    ctx.serverApp.locals.handler.close();
-    ctx.remoteApp.locals.handler.close();
-    ctx.ServerModel = null;
-    ctx.RemoteModel = null;
+    serverApp.locals.handler.close();
+    ServerModel = null;
+    ClientModel = null;
   });
 
   describe('Model.create([data], [callback])', function() {
     it('should create an instance and save to the attached data source',
         function(done) {
-      ctx.RemoteModel.create({first: 'Joe', last: 'Bob'}, function(err, user) {
+      ClientModel.create({first: 'Joe', last: 'Bob'}, function(err, user) {
         if (err) return done(err);
-        assert(user instanceof ctx.RemoteModel);
+        assert(user instanceof ClientModel);
         done();
       });
     });
@@ -55,7 +57,7 @@ describe('Remote model tests', function() {
   describe('model.save([options], [callback])', function() {
     it('should save an instance of a Model to the attached data source',
         function(done) {
-      var joe = new ctx.RemoteModel({first: 'Joe', last: 'Bob'});
+      const joe = new ClientModel({first: 'Joe', last: 'Bob'});
       joe.save(function(err, user) {
         if (err) return done(err);
         assert(user.id);
@@ -68,7 +70,7 @@ describe('Remote model tests', function() {
   describe('model.updateAttributes(data, [callback])', function() {
     it('should save specified attributes to the attached data source',
         function(done) {
-      ctx.ServerModel.create({first: 'joe', age: 100}, function(err, user) {
+      ServerModel.create({first: 'joe', age: 100}, function(err, user) {
         if (err) return done(err);
         assert.equal(user.first, 'joe');
 
@@ -89,11 +91,11 @@ describe('Remote model tests', function() {
   describe('Model.upsert(data, callback)', function() {
     it('should update when a record with id=data.id is found, insert otherwise',
         function(done) {
-      ctx.RemoteModel.upsert({first: 'joe', id: 7}, function(err, user) {
+      ClientModel.upsert({first: 'joe', id: 7}, function(err, user) {
         if (err) return done(err);
         assert.equal(user.first, 'joe');
 
-        ctx.RemoteModel.upsert({first: 'bob', id: 7}, function(err,
+        ClientModel.upsert({first: 'bob', id: 7}, function(err,
             updatedUser) {
           if (err) return done(err);
           assert.equal(updatedUser.first, 'bob');
@@ -106,11 +108,11 @@ describe('Remote model tests', function() {
   describe('Model.deleteById(id, [callback])', function() {
     it('should delete a model instance from the attached data source',
         function(done) {
-      ctx.ServerModel.create({first: 'joe', last: 'bob'}, function(err, user) {
+      ServerModel.create({first: 'joe', last: 'bob'}, function(err, user) {
         if (err) return done(err);
-        ctx.RemoteModel.deleteById(user.id, function(err) {
+        ClientModel.deleteById(user.id, function(err) {
           if (err) return done(err);
-          ctx.RemoteModel.findById(user.id, function(err, notFound) {
+          ClientModel.findById(user.id, function(err, notFound) {
             assert.equal(notFound, null);
             assert(err && err.statusCode === 404,
               'should have failed with HTTP 404');
@@ -124,10 +126,10 @@ describe('Remote model tests', function() {
   describe('Model.findById(id, callback)', function() {
     it('should find an instance by id from the attached data source',
         function(done) {
-      ctx.ServerModel.create({first: 'michael', last: 'jordan', id: 23},
+      ServerModel.create({first: 'michael', last: 'jordan', id: 23},
           function(err) {
         if (err) return done(err);
-        ctx.RemoteModel.findById(23, function(err, user) {
+        ClientModel.findById(23, function(err, user) {
           if (err) return done(err);
           assert.equal(user.id, 23);
           assert.equal(user.first, 'michael');
@@ -141,16 +143,16 @@ describe('Remote model tests', function() {
   describe('Model.count([query], callback)', function() {
     it('should return the count of Model instances from both data source',
         function(done) {
-      var taskEmitter = new TaskEmitter();
+      const taskEmitter = new TaskEmitter();
       taskEmitter
-        .task(ctx.ServerModel, 'create', {first: 'jill', age: 100})
-        .task(ctx.RemoteModel, 'create', {first: 'bob', age: 200})
-        .task(ctx.RemoteModel, 'create', {first: 'jan'})
-        .task(ctx.ServerModel, 'create', {first: 'sam'})
-        .task(ctx.ServerModel, 'create', {first: 'suzy'})
+        .task(ServerModel, 'create', {first: 'jill', age: 100})
+        .task(ClientModel, 'create', {first: 'bob', age: 200})
+        .task(ClientModel, 'create', {first: 'jan'})
+        .task(ServerModel, 'create', {first: 'sam'})
+        .task(ServerModel, 'create', {first: 'suzy'})
         .on('done', function(err) {
           if (err) return done(err);
-          ctx.RemoteModel.count({age: {gt: 99}}, function(err, count) {
+          ClientModel.count({age: {gt: 99}}, function(err, count) {
             if (err) return done(err);
             assert.equal(count, 2);
             done();

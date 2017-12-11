@@ -5,27 +5,31 @@
 
 'use strict';
 
-var assert = require('assert');
-var helper = require('./helper');
-var TaskEmitter = require('strong-task-emitter');
+const assert = require('assert');
+const helper = require('./helper');
+const loopback = require('loopback');
+const TaskEmitter = require('strong-task-emitter');
 
 describe('Model tests', function() {
-  var User;
+  let User;
 
   beforeEach(function() {
-    User = helper.createModel({
-      parent: 'user',
-      app: helper.createRestAppAndListen(),
-      datasource: helper.createMemoryDataSource(),
-      properties: helper.getUserProperties()
+    const app = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
+
+    User = app.registry.createModel({
+      name: 'user',
+      properties: helper.getUserProperties(),
+      options: {forceId: false},
     });
+    app.model(User, {dataSource: db});
   });
 
   describe('Model.validatesPresenceOf(properties...)', function() {
     it('should require a model to include a property to be considered valid',
         function() {
       User.validatesPresenceOf('first', 'last', 'age');
-      var joe = new User({first: 'joe'});
+      const joe = new User({first: 'joe'});
       assert(joe.isValid() === false, 'model should not validate');
       assert(joe.errors.last, 'should have a missing last error');
       assert(joe.errors.age, 'should have a missing age error');
@@ -37,7 +41,7 @@ describe('Model tests', function() {
         function() {
       User.validatesLengthOf('password', {min: 5, message: {min:
           'Password is too short'}});
-      var joe = new User({password: '1234'});
+      const joe = new User({password: '1234'});
       assert(joe.isValid() === false, 'model should not be valid');
       assert(joe.errors.password, 'should have password error');
     });
@@ -47,7 +51,7 @@ describe('Model tests', function() {
     it('should require a value for `property` to be in the specified array',
         function() {
       User.validatesInclusionOf('gender', {in: ['male', 'female']});
-      var foo = new User({gender: 'bar'});
+      const foo = new User({gender: 'bar'});
       assert(foo.isValid() === false, 'model should not be valid');
       assert(foo.errors.gender, 'should have gender error');
     });
@@ -57,9 +61,9 @@ describe('Model tests', function() {
     it('should require a value for `property` to not exist in the specified ' +
         'array', function() {
       User.validatesExclusionOf('domain', {in: ['www', 'billing', 'admin']});
-      var foo = new User({domain: 'www'});
-      var bar = new User({domain: 'billing'});
-      var bat = new User({domain: 'admin'});
+      const foo = new User({domain: 'www'});
+      const bar = new User({domain: 'billing'});
+      const bat = new User({domain: 'admin'});
       assert(foo.isValid() === false);
       assert(bar.isValid() === false);
       assert(bat.isValid() === false);
@@ -73,9 +77,9 @@ describe('Model tests', function() {
     it('should require a value for `property` to be a specific type of ' +
         '`Number`', function() {
       User.validatesNumericalityOf('age', {int: true});
-      var joe = new User({age: 10.2});
+      const joe = new User({age: 10.2});
       assert(joe.isValid() === false);
-      var bob = new User({age: 0});
+      const bob = new User({age: 0});
       assert(bob.isValid() === true);
       assert(joe.errors.age, 'model should have an age error');
     });
@@ -84,15 +88,15 @@ describe('Model tests', function() {
   describe('myModel.isValid()', function() {
     it('should validate the model instance', function() {
       User.validatesNumericalityOf('age', {int: true});
-      var user = new User({first: 'joe', age: 'flarg'});
-      var valid = user.isValid();
+      const user = new User({first: 'joe', age: 'flarg'});
+      const valid = user.isValid();
       assert(valid === false);
       assert(user.errors.age, 'model should have age error');
     });
 
     it('should validate the model asynchronously', function(done) {
       User.validatesNumericalityOf('age', {int: true});
-      var user = new User({first: 'joe', age: 'flarg'});
+      const user = new User({first: 'joe', age: 'flarg'});
       user.isValid(function(valid) {
         assert(valid === false);
         assert(user.errors.age, 'model should have age error');
@@ -115,7 +119,7 @@ describe('Model tests', function() {
   describe('model.save([options], [callback])', function() {
     it('should save an instance of a Model to the attached data source',
         function(done) {
-      var joe = new User({first: 'Joe', last: 'Bob'});
+      const joe = new User({first: 'Joe', last: 'Bob'});
       joe.save(function(err, user) {
         if (err) return done(err);
         assert(user.id);
@@ -218,7 +222,7 @@ describe('Model tests', function() {
   describe('Model.count([query], callback)', function() {
     it('should return the count of Model instances in data source',
         function(done) {
-      var taskEmitter = new TaskEmitter();
+      const taskEmitter = new TaskEmitter();
       taskEmitter
         .task(User, 'create', {first: 'jill', age: 100})
         .task(User, 'create', {first: 'bob', age: 200})

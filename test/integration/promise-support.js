@@ -1,9 +1,16 @@
-var assert = require('assert');
-var helper = require('../helper');
-var Promise = require('bluebird');
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: loopback-connector-remote
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
 
-var globalPromiseSetManually = false;
-var User;
+'use strict';
+
+const assert = require('assert');
+const helper = require('../helper');
+const Promise = require('bluebird');
+
+let globalPromiseSetManually = false;
+let User;
 
 describe('promise support', function() {
   before(setGlobalPromise);
@@ -12,21 +19,21 @@ describe('promise support', function() {
 
   context('create', function() {
     it('supports promises', function() {
-      var retval = User.create();
+      const retval = User.create();
       assert(retval && typeof retval.then === 'function');
     });
   });
 
   context('find', function() {
     it('supports promises', function() {
-      var retval = User.find();
+      const retval = User.find();
       assert(retval && typeof retval.then === 'function');
     });
   });
 
   context('findById', function() {
     it('supports promises', function() {
-      var retval = User.findById(1);
+      const retval = User.findById(1);
       assert(retval && typeof retval.then === 'function');
     });
   });
@@ -40,12 +47,15 @@ function setGlobalPromise() {
 }
 
 function createUserModel() {
-  User = helper.createModel({
-    parent: 'user',
-    app: helper.createRestAppAndListen(),
-    datasource: helper.createMemoryDataSource(),
-    properties: helper.getUserProperties()
+  const app = helper.createRestAppAndListen();
+  const db = helper.createMemoryDataSource(app);
+
+  User = app.registry.createModel({
+    name: 'user',
+    properties: helper.getUserProperties(),
+    options: {forceId: false},
   });
+  app.model(User, {dataSource: db});
 }
 
 function resetGlobalPromise() {
