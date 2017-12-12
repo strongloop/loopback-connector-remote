@@ -49,7 +49,6 @@ module.exports = function(grunt) {
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task.
   grunt.registerTask('default', ['unit', 'integration']);
