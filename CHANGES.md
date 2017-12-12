@@ -1,3 +1,15 @@
+2017-12-12, Version 3.3.0
+=========================
+
+ * Gruntfile: remove forgotten jshint task (Miroslav Bajtoš)
+
+ * Preserve related models from "include" filter (Dimitris)
+
+ * Add eslint to npm test, fix linter issues (Miroslav Bajtoš)
+
+ * Refactor tests to use local per-app model registry (Miroslav Bajtoš)
+
+
 2017-12-05, Version 3.2.0
 =========================
 
