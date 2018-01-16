@@ -1,3 +1,11 @@
+2018-01-16, Version 3.3.1
+=========================
+
+ * chore: update copyright notice years (Miroslav Bajtoš)
+
+ * Fix duplicate definition of a remote model type (maxim.sharai)
+
+
 2017-12-12, Version 3.3.0
 =========================
 
