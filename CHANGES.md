@@ -1,3 +1,11 @@
+2018-06-21, Version 3.4.0
+=========================
+
+ * move dependencies (Stephen Crawford)
+
+ * chore: drop node 4 and update deps (Taranveer Virk)
+
+
 2018-01-16, Version 3.3.1
 =========================
 
