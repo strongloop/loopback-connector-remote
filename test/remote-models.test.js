@@ -191,9 +191,8 @@ describe('Remote model tests', function() {
           ClientModel.deleteById(user.id, function(err) {
             if (err) return done(err);
             ClientModel.findById(user.id, function(err, notFound) {
+              if (err) return done(err);
               assert.equal(notFound, null);
-              assert(err && err.statusCode === 404,
-                'should have failed with HTTP 404');
               done();
             });
           });
@@ -202,6 +201,15 @@ describe('Remote model tests', function() {
   });
 
   describe('Model.findById(id, callback)', function() {
+    it('should return null when an instance does not exist',
+      function(done) {
+        ClientModel.findById(23, function(err, notFound) {
+          if (err) return done(err);
+          assert.equal(notFound, null);
+          done();
+        });
+      });
+
     it('should find an instance by id from the attached data source',
       function(done) {
         ServerModel.create({first: 'michael', last: 'jordan', id: 23},
@@ -212,6 +220,32 @@ describe('Remote model tests', function() {
               assert.equal(user.id, 23);
               assert.equal(user.first, 'michael');
               assert.equal(user.last, 'jordan');
+              done();
+            });
+          });
+      });
+  });
+
+  describe('Model.findOne([filter], callback)', function() {
+    it('should return null when an instance does not exist',
+      function(done) {
+        ClientModel.findOne({where: {id: 24}}, function(err, notFound) {
+          if (err) return done(err);
+          assert.equal(notFound, null);
+          done();
+        });
+      });
+
+    it('should find an instance from the attached data source',
+      function(done) {
+        ServerModel.create({first: 'keanu', last: 'reeves', id: 24},
+          function(err) {
+            if (err) return done(err);
+            ClientModel.findOne({where: {id: 24}}, function(err, user) {
+              if (err) return done(err);
+              assert.equal(user.id, 24);
+              assert.equal(user.first, 'keanu');
+              assert.equal(user.last, 'reeves');
               done();
             });
           });
