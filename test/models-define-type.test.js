@@ -37,7 +37,8 @@ describe('Models Define Type Tests', function() {
     clientApp.model(RemoteModel, {dataSource: remoteDs});
 
     sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-      RemoteModel.modelName));
+      RemoteModel.modelName
+    ));
   });
 
   describe('when a child model is created', () => {
@@ -65,9 +66,11 @@ describe('Models Define Type Tests', function() {
           clientApp.model(RemoteModel, {dataSource: remoteDs});
 
           sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-            RemoteModel.modelName));
+            RemoteModel.modelName
+          ));
           sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-            ChildModel.modelName));
+            ChildModel.modelName
+          ));
         });
     });
   });
