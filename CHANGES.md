@@ -1,3 +1,11 @@
+2019-01-22, Version 3.4.1
+=========================
+
+ * fix: return null when findById/findOne returns 404 (Jannis Ötjengerdes)
+
+ * style: fix linting (virkt25)
+
+
 2018-06-21, Version 3.4.0
 =========================
 
