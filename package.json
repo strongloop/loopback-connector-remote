@@ -47,5 +47,6 @@
     "sinon": "^6.0.0",
     "strong-task-emitter": "^0.0.8"
   },
-  "optionalDependencies": {}
+  "optionalDependencies": {},
+  "author": "IBM Corp."
 }
