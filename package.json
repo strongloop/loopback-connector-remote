@@ -37,11 +37,11 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "bluebird": "^3.5.1",
+    "eslint": "^6.5.1",
+    "eslint-config-loopback": "^13.1.0",
     "grunt": "^1.0.3",
     "grunt-cli": "^1.2.0",
     "grunt-mocha-test": "^0.13.3",
-    "eslint": "^5.4.0",
-    "eslint-config-loopback": "^11.0.0",
     "loopback": "^3.0.0",
     "mocha": "^5.2.0",
     "sinon": "^6.0.0",
