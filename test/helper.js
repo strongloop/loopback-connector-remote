@@ -5,9 +5,9 @@
 
 'use strict';
 
-var extend = require('util')._extend;
-var loopback = require('loopback');
-var remoteConnector = require('..');
+const extend = require('util')._extend;
+const loopback = require('loopback');
+const remoteConnector = require('..');
 
 exports.createMemoryDataSource = createMemoryDataSource;
 exports.createRemoteDataSource = createRemoteDataSource;
