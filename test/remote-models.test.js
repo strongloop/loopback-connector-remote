@@ -373,4 +373,17 @@ describe('Remote model tests', function() {
         });
     }
   });
+
+  describe('Model.updateAll([where], [data])', () => {
+    it('returns the count of updated instances in data source', async () => {
+      await ServerModel.create({first: 'baby', age: 1});
+      await ServerModel.create({first: 'grandma', age: 80});
+
+      const result = await ClientModel.updateAll(
+        {age: {lt: 6}},
+        {last: 'young'},
+      );
+      assert.deepEqual(result, {count: 1});
+    });
+  });
 });
