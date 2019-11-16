@@ -37,7 +37,7 @@ describe('Models Define Type Tests', function() {
     clientApp.model(RemoteModel, {dataSource: remoteDs});
 
     sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-      RemoteModel.modelName
+      RemoteModel.modelName,
     ));
   });
 
@@ -66,10 +66,10 @@ describe('Models Define Type Tests', function() {
           clientApp.model(RemoteModel, {dataSource: remoteDs});
 
           sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-            RemoteModel.modelName
+            RemoteModel.modelName,
           ));
           sinon.assert.calledOnce(defineObjectTypeSpy.withArgs(
-            ChildModel.modelName
+            ChildModel.modelName,
           ));
         });
     });
