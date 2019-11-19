@@ -12,7 +12,8 @@
   "scripts": {
     "test": "grunt",
     "posttest": "npm run lint",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "engines": {
     "node": ">=8"
